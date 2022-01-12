@@ -16,25 +16,25 @@ namespace Dio.Series
 				switch (opcaoUsuario)
 				{
 					case "1":
-						ListarSeries();
+						Listar();
 						break;
 					case "2":
-						InserirSerie();
+						Inserir();
 						break;
 					case "3":
-						AtualizarSerie();
+						Atualizar();
 						break;
 					case "4":
-						ExcluirSerie();
+						Excluir();
 						break;
 					case "5":
-						VisualizarSerie();
+						Visualizar();
 						break;
 					case "C":
 						Console.Clear();
 						break;
                     case "6":
-                        isSerie = false;
+                        isSerie = !isSerie;
                         break;
 					default:
 						throw new ArgumentOutOfRangeException();
@@ -47,13 +47,15 @@ namespace Dio.Series
 			Console.ReadLine();
         }
 
-        private static void ExcluirSerie()
+        private static void Excluir()
 		{
             try
             {
             	Console.Write("Digite o id d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
 			    int indiceSerie = int.Parse(Console.ReadLine());
-                negocio.excluirSerie(indiceSerie);
+                
+                if(isSerie){negocio.excluirSerie(indiceSerie);}
+                else{negocio.excluirFilme(indiceSerie);}
             }
             catch (Exception e)
             {
@@ -66,14 +68,14 @@ namespace Dio.Series
 			
 		}
 
-        private static void VisualizarSerie()
+        private static void Visualizar()
 		{
 			Console.Write("Digite o id d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
 			int indiceSerie = int.Parse(Console.ReadLine());
             try
-            {
-                var serie = negocio.getSerie(indiceSerie);
-                Console.WriteLine(serie);
+            {   
+                if(isSerie){var serie = negocio.getSerie(indiceSerie);Console.WriteLine(serie);}
+                else{var filme = negocio.getFilme(indiceSerie);Console.WriteLine(filme);}
             }
             catch (Exception e)
             {
@@ -86,7 +88,7 @@ namespace Dio.Series
 				
 		}
 
-        private static void AtualizarSerie()
+        private static void Atualizar()
 		{
             try
             {
@@ -117,17 +119,40 @@ namespace Dio.Series
 
                     Console.Write("Digite o numero de temporadas: ");
                     int entrada_num_temporadas = int.Parse(Console.ReadLine());
+
+                    Console.WriteLine("Digite o nome do Showrunner: ");
+                    string entrada_showrunner = Console.ReadLine();
+
                     Serie atualizaSerie = new Serie(id: indiceSerie,
                             genero: (Genero)entradaGenero,
                             titulo: entradaTitulo,
                             descricao: entradaDescricao,
                             ano: entradaAno,
                             num_episodios: entrada_num_episodios,
-                            num_temporadas: entrada_num_temporadas
+                            num_temporadas: entrada_num_temporadas,
+                            showrunner: entrada_showrunner
                             );
                     negocio.atualizaSerie(indiceSerie, atualizaSerie);
                 }else{
+                    Console.Write("Digite o nome do diretor: ");
+                    string entrada_diretor = Console.ReadLine();
 
+                    Console.Write("Digite a duração do filme em minutos: ");
+                    int entrada_duracao_minutos = int.Parse(Console.ReadLine());
+
+                    Console.WriteLine("Digite o número de indicações ao Oscar: ");
+                    int entrada_indicacoes = int.Parse(Console.ReadLine());
+
+                    Filme atualizaFilme = new Filme(id: indiceSerie,
+                            genero: (Genero)entradaGenero,
+                            titulo: entradaTitulo,
+                            descricao: entradaDescricao,
+                            ano: entradaAno,
+                            diretor: entrada_diretor,
+                            duracao_minutos: entrada_duracao_minutos,
+                            indicacoes_oscar: entrada_indicacoes
+                            );
+                    negocio.atualizaFilme(indiceSerie, atualizaFilme);
                 }
             }
             catch (Exception e)
@@ -141,29 +166,46 @@ namespace Dio.Series
             }
 			
 		}
-        private static void ListarSeries()
+        private static void Listar()
 		{
 			Console.WriteLine("Listar {0}", isSerie? "séries":"filmes");
 
+            //numa aplicação real isso seria muito ruim, porque estou dando get nos 2 repositórios sem precisar
+            //porém n sei um jeito melhor de fazer aqui, por causa do fato de c# ser fortemente tipada não posso simplesmente sobrescrever a lista
 			var lista = negocio.getAllSeries();
+            var lista2 = negocio.getAllFilmes();
 
-			if (lista.Count == 0)
+			if ((lista.Count == 0 && isSerie) || (lista2.Count == 0 && !isSerie))
 			{
 				Console.WriteLine("{0}", isSerie? "Nenhuma série registrada": "Nenhum filme registrado");
 				return;
 			}
-
-			foreach (var serie in lista)
-			{
-                var excluido = serie.retornaExcluido();
-                if(!excluido){
-                    Console.WriteLine("#ID {0}: - {1}", serie.retornaId(), serie.retornaTitulo());
+            
+            //duplicação de código pelo mesmo motivo que citei acima
+            if(isSerie){
+                foreach (var serie in lista)
+                {
+                    var excluido = serie.retornaExcluido();
+                    if(!excluido){
+                        Console.WriteLine("#ID {0}: - {1}", serie.retornaId(), serie.retornaTitulo());
+                    }
+                    
                 }
-				
-			}
+            }else{
+                foreach (var filme in lista2)
+                {
+                    var excluido = filme.retornaExcluido();
+                    if(!excluido){
+                        Console.WriteLine("#ID {0}: - {1}", filme.retornaId(), filme.retornaTitulo());
+                    }
+                    
+                }
+            }
+
+
 		}
 
-        private static void InserirSerie()
+        private static void Inserir()
 		{
             try
             {
@@ -194,16 +236,40 @@ namespace Dio.Series
                     Console.Write("Digite o numero de temporadas: ");
                     int entrada_num_temporadas = int.Parse(Console.ReadLine());
 
+                    Console.WriteLine("Digite o nome do Showrunner: ");
+                    string entrada_showrunner = Console.ReadLine();
+
                     Serie novaSerie = new Serie(id: negocio.proximoIdSerie(),
                                                 genero: (Genero)entradaGenero,
                                                 titulo: entradaTitulo,
                                                 descricao: entradaDescricao,
                                                 ano: entradaAno,
                                                 num_episodios: entrada_num_episodios,
-                                                num_temporadas: entrada_num_temporadas
+                                                num_temporadas: entrada_num_temporadas,
+                                                showrunner: entrada_showrunner
                                                 );
 
                     negocio.insereSerie(novaSerie);
+                }else{
+                    Console.Write("Digite o nome do diretor: ");
+                    string entrada_diretor = Console.ReadLine();
+
+                    Console.Write("Digite a duração do filme em minutos: ");
+                    int entrada_duracao_minutos = int.Parse(Console.ReadLine());
+
+                    Console.WriteLine("Digite o número de indicações ao Oscar: ");
+                    int entrada_indicacoes = int.Parse(Console.ReadLine());
+
+                    Filme filme = new Filme(id: negocio.proximoIdFilme(),
+                            genero: (Genero)entradaGenero,
+                            titulo: entradaTitulo,
+                            descricao: entradaDescricao,
+                            ano: entradaAno,
+                            diretor: entrada_diretor,
+                            duracao_minutos: entrada_duracao_minutos,
+                            indicacoes_oscar: entrada_indicacoes
+                            );
+                    negocio.insereFilme(filme);
                 }
 
             }
