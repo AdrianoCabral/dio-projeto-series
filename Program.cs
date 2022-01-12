@@ -6,7 +6,7 @@ namespace Dio.Series
     class Program
     {
         static Negocio negocio = new Negocio();
-        private Boolean isSerie = true;
+        static Boolean isSerie = true;
         static void Main(string[] args)
         {
             string opcaoUsuario = ObterOpcaoUsuario();
@@ -33,7 +33,9 @@ namespace Dio.Series
 					case "C":
 						Console.Clear();
 						break;
-
+                    case "6":
+                        isSerie = false;
+                        break;
 					default:
 						throw new ArgumentOutOfRangeException();
 				}
@@ -47,85 +49,107 @@ namespace Dio.Series
 
         private static void ExcluirSerie()
 		{
-			Console.Write("Digite o id da série: ");
-			int indiceSerie = int.Parse(Console.ReadLine());
             try
             {
+            	Console.Write("Digite o id d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
+			    int indiceSerie = int.Parse(Console.ReadLine());
                 negocio.excluirSerie(indiceSerie);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Console.WriteLine("ERRO! Série não encontrada");
+                if(e is FormatException){
+                    Console.WriteLine("ERRO! O valor digitado é inválido.");
+                }else{
+                    Console.WriteLine("ERRO! Série não encontrada");
+                }
             }
 			
 		}
 
         private static void VisualizarSerie()
 		{
-			Console.Write("Digite o id da série: ");
+			Console.Write("Digite o id d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
 			int indiceSerie = int.Parse(Console.ReadLine());
             try
             {
                 var serie = negocio.getSerie(indiceSerie);
                 Console.WriteLine(serie);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Console.WriteLine("ERRO! Série não encontrada");
+                if(e is FormatException){
+                    Console.WriteLine("ERRO! O valor digitado é inválido.");
+                }else{
+                    Console.WriteLine("ERRO! Série não encontrada");
+                }
             }
-			
-
-			
+				
 		}
 
         private static void AtualizarSerie()
 		{
-			Console.Write("Digite o id da série: ");
-			int indiceSerie = int.Parse(Console.ReadLine());
-
-			// https://docs.microsoft.com/pt-br/dotnet/api/system.enum.getvalues?view=netcore-3.1
-			// https://docs.microsoft.com/pt-br/dotnet/api/system.enum.getname?view=netcore-3.1
-			foreach (int i in Enum.GetValues(typeof(Genero)))
-			{
-				Console.WriteLine("{0}-{1}", i, Enum.GetName(typeof(Genero), i));
-			}
-			Console.Write("Digite o gênero entre as opções acima: ");
-			int entradaGenero = int.Parse(Console.ReadLine());
-
-			Console.Write("Digite o Título da Série: ");
-			string entradaTitulo = Console.ReadLine();
-
-			Console.Write("Digite o Ano de Início da Série: ");
-			int entradaAno = int.Parse(Console.ReadLine());
-
-			Console.Write("Digite a Descrição da Série: ");
-			string entradaDescricao = Console.ReadLine();
-
-			Serie atualizaSerie = new Serie(id: indiceSerie,
-										genero: (Genero)entradaGenero,
-										titulo: entradaTitulo,
-										ano: entradaAno,
-										descricao: entradaDescricao);
             try
             {
-                 negocio.atualizaSerie(indiceSerie, atualizaSerie);
+                Console.Write("Digite o id d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
+                int indiceSerie = int.Parse(Console.ReadLine());
+
+                // https://docs.microsoft.com/pt-br/dotnet/api/system.enum.getvalues?view=netcore-3.1
+                // https://docs.microsoft.com/pt-br/dotnet/api/system.enum.getname?view=netcore-3.1
+                foreach (int i in Enum.GetValues(typeof(Genero)))
+                {
+                    Console.WriteLine("{0}-{1}", i, Enum.GetName(typeof(Genero), i));
+                }
+                Console.Write("Digite o gênero entre as opções acima: ");
+                int entradaGenero = int.Parse(Console.ReadLine());
+
+                Console.Write("Digite o Título d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
+                string entradaTitulo = Console.ReadLine();
+
+                Console.Write("Digite o Ano de Lançamento d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
+                int entradaAno = int.Parse(Console.ReadLine());
+
+                Console.Write("Digite a Descrição d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
+                string entradaDescricao = Console.ReadLine();
+
+                if(isSerie){
+                    Console.Write("Digite o numero de episódios: ");
+                    int entrada_num_episodios = int.Parse(Console.ReadLine());
+
+                    Console.Write("Digite o numero de temporadas: ");
+                    int entrada_num_temporadas = int.Parse(Console.ReadLine());
+                    Serie atualizaSerie = new Serie(id: indiceSerie,
+                            genero: (Genero)entradaGenero,
+                            titulo: entradaTitulo,
+                            descricao: entradaDescricao,
+                            ano: entradaAno,
+                            num_episodios: entrada_num_episodios,
+                            num_temporadas: entrada_num_temporadas
+                            );
+                    negocio.atualizaSerie(indiceSerie, atualizaSerie);
+                }else{
+
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                
-                Console.WriteLine("ERRO! Série não encontrada");
+                if(e is FormatException){
+                    Console.WriteLine("ERRO! O valor digitado é inválido.");
+                }else{
+                    Console.WriteLine("ERRO! Série não encontrada");
+                }
+
             }
 			
 		}
         private static void ListarSeries()
 		{
-			Console.WriteLine("Listar séries");
+			Console.WriteLine("Listar {0}", isSerie? "séries":"filmes");
 
 			var lista = negocio.getAllSeries();
 
 			if (lista.Count == 0)
 			{
-				Console.WriteLine("Nenhuma série cadastrada.");
+				Console.WriteLine("{0}", isSerie? "Nenhuma série registrada": "Nenhum filme registrado");
 				return;
 			}
 
@@ -141,33 +165,53 @@ namespace Dio.Series
 
         private static void InserirSerie()
 		{
-			Console.WriteLine("Inserir nova série");
+            try
+            {
+                Console.WriteLine("Inserir nov{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
 
-			// https://docs.microsoft.com/pt-br/dotnet/api/system.enum.getvalues?view=netcore-3.1
-			// https://docs.microsoft.com/pt-br/dotnet/api/system.enum.getname?view=netcore-3.1
-			foreach (int i in Enum.GetValues(typeof(Genero)))
-			{
-				Console.WriteLine("{0}-{1}", i, Enum.GetName(typeof(Genero), i));
-			}
-			Console.Write("Digite o gênero entre as opções acima: ");
-			int entradaGenero = int.Parse(Console.ReadLine());
+                // https://docs.microsoft.com/pt-br/dotnet/api/system.enum.getvalues?view=netcore-3.1
+                // https://docs.microsoft.com/pt-br/dotnet/api/system.enum.getname?view=netcore-3.1
+                foreach (int i in Enum.GetValues(typeof(Genero)))
+                {
+                    Console.WriteLine("{0}-{1}", i, Enum.GetName(typeof(Genero), i));
+                }
+                Console.Write("Digite o gênero entre as opções acima: ");
+                int entradaGenero = int.Parse(Console.ReadLine());
 
-			Console.Write("Digite o Título da Série: ");
-			string entradaTitulo = Console.ReadLine();
+                Console.Write("Digite o Título d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
+                string entradaTitulo = Console.ReadLine();
 
-			Console.Write("Digite o Ano de Início da Série: ");
-			int entradaAno = int.Parse(Console.ReadLine());
+                Console.Write("Digite o Ano de Lançamento d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
+                int entradaAno = int.Parse(Console.ReadLine());
 
-			Console.Write("Digite a Descrição da Série: ");
-			string entradaDescricao = Console.ReadLine();
+                Console.Write("Digite a Descrição d{0} {1}: ", isSerie? "a": "o", isSerie ? "Série" : "Filme");
+                string entradaDescricao = Console.ReadLine();
 
-			Serie novaSerie = new Serie(id: negocio.proximoIdSerie(),
-										genero: (Genero)entradaGenero,
-										titulo: entradaTitulo,
-										ano: entradaAno,
-										descricao: entradaDescricao);
+                if(isSerie){
+                    Console.Write("Digite o numero de episódios: ");
+                    int entrada_num_episodios = int.Parse(Console.ReadLine());
 
-			negocio.insereSerie(novaSerie);
+                    Console.Write("Digite o numero de temporadas: ");
+                    int entrada_num_temporadas = int.Parse(Console.ReadLine());
+
+                    Serie novaSerie = new Serie(id: negocio.proximoIdSerie(),
+                                                genero: (Genero)entradaGenero,
+                                                titulo: entradaTitulo,
+                                                descricao: entradaDescricao,
+                                                ano: entradaAno,
+                                                num_episodios: entrada_num_episodios,
+                                                num_temporadas: entrada_num_temporadas
+                                                );
+
+                    negocio.insereSerie(novaSerie);
+                }
+
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("ERRO! O valor digitado é inválido.");
+            }
+			
 		}
 
         private static string ObterOpcaoUsuario()
@@ -176,11 +220,12 @@ namespace Dio.Series
 			Console.WriteLine("DIO Séries a seu dispor!!!");
 			Console.WriteLine("Informe a opção desejada:");
 
-			Console.WriteLine("1- Listar séries");
-			Console.WriteLine("2- Inserir nova série");
-			Console.WriteLine("3- Atualizar série");
-			Console.WriteLine("4- Excluir série");
-			Console.WriteLine("5- Visualizar série");
+			Console.WriteLine("1- Listar {0}", isSerie? "séries":"filmes");
+			Console.WriteLine("2- Inserir nov{0} {1}", isSerie? "a":"o", isSerie? "série":"filme");
+			Console.WriteLine("3- Atualizar {0}", isSerie? "série":"filme");
+			Console.WriteLine("4- Excluir {0}", isSerie? "série":"filme");
+			Console.WriteLine("5- Visualizar {0}", isSerie? "série":"filme");
+            Console.WriteLine("6- Trocar para o menu de {0}", isSerie? "filmes":"séries");
 			Console.WriteLine("C- Limpar Tela");
 			Console.WriteLine("X- Sair");
 			Console.WriteLine();

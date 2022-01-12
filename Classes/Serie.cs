@@ -4,16 +4,13 @@ namespace Dio.Series.Classes
     public class Serie : EntidadeBase
     {
         // Atributos
-
+        private int num_episodios {get;set;}
+        private int num_temporadas{get;set;}
         // Métodos
-		public Serie(int id, Genero genero, string titulo, string descricao, int ano) : base(id, genero, titulo, descricao,ano)
+		public Serie(int id, Genero genero, string titulo, string descricao, int ano, int num_episodios, int num_temporadas) : base(id, genero, titulo, descricao,ano)
 		{
-			this.Id = id;
-			this.Genero = genero;
-			this.Titulo = titulo;
-			this.Descricao = descricao;
-			this.Ano = ano;
-            this.Excluido = false;
+            this.num_episodios = num_episodios;
+            this.num_temporadas = num_temporadas;
 		}
 
         public override string ToString()
