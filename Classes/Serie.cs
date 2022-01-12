@@ -4,14 +4,9 @@ namespace Dio.Series.Classes
     public class Serie : EntidadeBase
     {
         // Atributos
-		private Genero Genero { get; set; }
-		private string Titulo { get; set; }
-		private string Descricao { get; set; }
-		private int Ano { get; set; }
-        private bool Excluido {get; set;}
 
         // Métodos
-		public Serie(int id, Genero genero, string titulo, string descricao, int ano)
+		public Serie(int id, Genero genero, string titulo, string descricao, int ano) : base(id, genero, titulo, descricao,ano)
 		{
 			this.Id = id;
 			this.Genero = genero;
@@ -32,22 +27,5 @@ namespace Dio.Series.Classes
             retorno += "Excluido: " + this.Excluido;
 			return retorno;
 		}
-
-        public string retornaTitulo()
-		{
-			return this.Titulo;
-		}
-
-		public int retornaId()
-		{
-			return this.Id;
-		}
-        public bool retornaExcluido()
-		{
-			return this.Excluido;
-		}
-        public void Excluir() {
-            this.Excluido = true;
-        }
     }
 }

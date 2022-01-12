@@ -6,6 +6,7 @@ namespace Dio.Series
     class Program
     {
         static Negocio negocio = new Negocio();
+        private Boolean isSerie = true;
         static void Main(string[] args)
         {
             string opcaoUsuario = ObterOpcaoUsuario();
